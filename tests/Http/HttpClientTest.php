@@ -76,6 +76,22 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testOnlyFirstMatchingCallbackForUrlStubbedByPathIsExecuted()
+    {
+        $this->factory->fake([
+            'foo.com/*' => function() {
+                return ['page' => 'foo'];
+            },
+            '*' => function() {
+                throw new \Exception('bad');
+            },
+        ]);
+
+        $response = $this->factory->post('http://foo.com/test');
+
+        $this->assertSame('foo', $response['page']);
+    }
+
     public function testCanSendJsonData()
     {
         $this->factory->fake();

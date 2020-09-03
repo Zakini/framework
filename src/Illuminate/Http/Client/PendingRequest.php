@@ -688,10 +688,10 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? collect())
+                     ->lazy()
                      ->map
                      ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                     ->first(fn($r) => $r !== null);
 
                 if (is_null($response)) {
                     return $handler($request, $options);
